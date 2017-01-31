@@ -2,6 +2,8 @@
 # MQTT message translator
 # This script is used to pass messages between Homie devices and PiDome server
 #-------------------------------------------------------------------------------
+# 2017-01-31, RDU: Updated mapping for a Homie node 23>2 and latest PiDome snapshot
+# 2017-01-29, RDU: Added setters for HVAC inverter over IR (test only)
 # 2017-01-23, RDU: Can echo Homie messages to PiDome and command from PiDome to Homie
 # 2017-01-22, RDU: Initial draft
 ################################################################################
@@ -26,13 +28,20 @@ mqtt_port = 1883
 
 devices = {
     "5ccf7fd3945b": "17",
-    "17": "5ccf7fd3945b"
+    "17": "5ccf7fd3945b",
+    "homie-ds18b20": "22",
+    "22": "homie-ds18b20",
+    "6001940b97c8": "2",
+    "2": "6001940b97c8"
   }
 
 commands = {
     "temperature/degrees": "dht/temp",
     "humidity/relative": "dht/humi",
-    "LED/on": "switch/on/set"
+    "LED/on": "switch/on/set",
+    "HVACIRLED/btnOff": "HVAC/mode/set",
+    "HVACIRLED/btnDry": "HVAC/mode/set",
+    "HVACIRLED/heat22": "HVAC/mode/set"
   }
 
 topicPrefixHomie = "homie/"
@@ -41,7 +50,8 @@ topicPrefixPiDome = "/hooks/devices/"
 topics = {
   topicPrefixHomie + "+/temperature/degrees",
   topicPrefixHomie + "+/humidity/relative",
-  topicPrefixPiDome + "+/LED/on"
+  topicPrefixPiDome + "+/LED/on",
+  topicPrefixPiDome + "+/HVACIRLED/#"
 }
 
 
@@ -86,7 +96,7 @@ def translateTopic(mqttc, msg):
     print("  > PAYLOAD: " + str(msg.payload))
 
   # Check if we need to translate a topic received from Homie or PiDome
-  res = "Unhandled: " + str(msg.topic)      
+  res = ""      
   if msg.topic.startswith(topicPrefixHomie):
     res = translateTopicFromHomieNodeToPiDome(mqttc, msg)
   if msg.topic.startswith(topicPrefixPiDome):
@@ -134,6 +144,7 @@ def on_message(mqttc, userdata, msg):
     if verbose:
       print("Not able to translate this topic : " + msg.topic)
   else:
+    print("  > Publishing translated topic : " + translatedTopic + " " + str(msg.qos) + " " + str(msg.payload))
     mqttc.publish(translatedTopic, msg.payload)
 
 
@@ -155,6 +166,7 @@ def on_log(mqttc, obj, level, string):
 # Note that in the case of a SETTER from PiDome to HomieNode, we won't translate the HomieNode topic again
 def subscribeToTopics(mqttc):
   for val in topics:
+    print "Subscribing to topic : " + val
     mqttc.subscribe(val, 0)
 
 
