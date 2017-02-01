@@ -144,8 +144,12 @@ def on_message(mqttc, userdata, msg):
     if verbose:
       print("Not able to translate this topic : " + msg.topic)
   else:
-    print("  > Publishing translated topic : " + translatedTopic + " " + str(msg.qos) + " " + str(msg.payload))
-    mqttc.publish(translatedTopic, msg.payload)
+    # http://www.hivemq.com/blog/mqtt-essentials-part-6-mqtt-quality-of-service-levels
+    iQoS = 0 # Enforce only once
+    # https://eclipse.org/paho/clients/python/docs/#publishing
+    bRetain = False # Enforce to confirm this one is latest proper value
+    print("  > Publishing translated topic : " + translatedTopic + ", QoS=" + str(iQoS) + ", Payload=" + str(msg.payload) + ", Retain=" + str(bRetain))
+    mqttc.publish(translatedTopic, msg.payload, iQoS, bRetain)
 
 
 def on_publish(mqttc, obj, mid):
