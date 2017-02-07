@@ -1,15 +1,19 @@
 # This Python script aims at translating messages between a PiDome home automation system and a Homie device.
 
 > Disclaimer : This is a really quick'n'dirty script from a Python n00b.
-> It has only been tested on my W7 x64 computer running Python 2.7 and paho-mqtt (https://github.com/eclipse/paho.mqtt.python).
+> It has been tested on :
+> * my W7 x64 computer running Python 2.7.13 and paho-mqtt 1.2
+> * my Raspberry Pi running Raspbian Wheezy, Python 2.7.3 and paho-mqtt 1.2
+
+For paho-mqtt, see https://github.com/eclipse/paho.mqtt.python
 
 ## Execution overview
 
 ![alt text](https://github.com/amayii0/Homie-PiDome-MQTT-translator/blob/master/docs/mqttTranslator-20170123.gif "Script in console next to PiDome dashboard")
 
 ## Home Automation part : PiDome
-**PiDome 0.1-SNAPSHOT-2016-06-10.691** (https://pidome.org/) is configured to use a custom MQTT device consisting of:
-- a **D1 Mini MCU** based on **ESP8266**
+**PiDome 0.1-SNAPSHOT-2017-01-29.717** (https://pidome.org/ with rollback on MQTT broker, see http://forum.pidome.org/viewtopic.php?id=329) is configured to use a custom MQTT device consisting of:
+- a **D1 Mini MCU** based on **ESP8266** : Arduino compatible device with built-in WiFi
 - a **DHT22 sensor** : Temperature (Celcius) + Humidity (%) using pin D3
 - a **LED** : A digital write (0/1) will turn LED off or on using pin D5
 
